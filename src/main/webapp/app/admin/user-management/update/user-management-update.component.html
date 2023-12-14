@@ -1,0 +1,139 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="myUserLabel" jhiTranslate="userManagement.home.createOrEditLabel">创建或编辑用户</h2>
+
+      <jhi-alert-error></jhi-alert-error>
+
+      <div class="mb-3" [hidden]="!editForm.value.id">
+        <label jhiTranslate="global.field.id">ID</label>
+        <input type="text" class="form-control" name="id" formControlName="id" readonly />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" jhiTranslate="userManagement.login">登录</label>
+        <input type="text" class="form-control" name="login" formControlName="login" />
+
+        @if (editForm.get('login')!.invalid && (editForm.get('login')!.dirty || editForm.get('login')!.touched)) {
+          <div>
+            @if (editForm.get('login')?.errors?.required) {
+              <small class="form-text text-danger" jhiTranslate="entity.validation.required">本字段不能为空.</small>
+            }
+
+            @if (editForm.get('login')?.errors?.maxlength) {
+              <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: 50 }"
+                >本字段最大长度为 50 个字符.</small
+              >
+            }
+
+            @if (editForm.get('login')?.errors?.pattern) {
+              <small class="form-text text-danger" jhiTranslate="entity.validation.patternLogin"
+                >This field can only contain letters, digits and e-mail addresses.</small
+              >
+            }
+          </div>
+        }
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" jhiTranslate="userManagement.firstName">名字</label>
+        <input type="text" class="form-control" name="firstName" formControlName="firstName" />
+
+        @if (editForm.get('firstName')!.invalid && (editForm.get('firstName')!.dirty || editForm.get('firstName')!.touched)) {
+          <div>
+            @if (editForm.get('firstName')?.errors?.maxlength) {
+              <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: 50 }"
+                >本字段最大长度为 50 个字符.</small
+              >
+            }
+          </div>
+        }
+      </div>
+
+      <div class="mb-3">
+        <label jhiTranslate="userManagement.lastName">姓氏</label>
+        <input type="text" class="form-control" name="lastName" formControlName="lastName" />
+
+        @if (editForm.get('lastName')!.invalid && (editForm.get('lastName')!.dirty || editForm.get('lastName')!.touched)) {
+          <div>
+            @if (editForm.get('lastName')?.errors?.maxlength) {
+              <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: 50 }"
+                >本字段最大长度为 50 个字符.</small
+              >
+            }
+          </div>
+        }
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" jhiTranslate="userManagement.email">邮箱</label>
+        <input type="email" class="form-control" name="email" formControlName="email" />
+
+        @if (editForm.get('email')!.invalid && (editForm.get('email')!.dirty || editForm.get('email')!.touched)) {
+          <div>
+            @if (editForm.get('email')?.errors?.required) {
+              <small class="form-text text-danger" jhiTranslate="entity.validation.required">本字段不能为空.</small>
+            }
+
+            @if (editForm.get('email')?.errors?.maxlength) {
+              <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: 100 }"
+                >本字段最大长度为 100 个字符.</small
+              >
+            }
+
+            @if (editForm.get('email')?.errors?.minlength) {
+              <small class="form-text text-danger" jhiTranslate="entity.validation.minlength" [translateValues]="{ min: 5 }"
+                >本字段最短长度为 5 个字符.</small
+              >
+            }
+
+            @if (editForm.get('email')?.errors?.email) {
+              <small class="form-text text-danger" jhiTranslate="global.messages.validate.email.invalid">您的电子邮件格式格式不正确.</small>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="form-check">
+        <label class="form-check-label" for="activated">
+          <input
+            class="form-check-input"
+            [attr.disabled]="editForm.value.id === undefined ? 'disabled' : null"
+            type="checkbox"
+            id="activated"
+            name="activated"
+            formControlName="activated"
+          />
+          <span jhiTranslate="userManagement.activated">已激活</span>
+        </label>
+      </div>
+
+      @if (languages && languages.length > 0) {
+        <div class="mb-3">
+          <label jhiTranslate="userManagement.langKey">语言</label>
+          <select class="form-control" id="langKey" name="langKey" formControlName="langKey">
+            @for (language of languages; track $index) {
+              <option [value]="language">{{ language | findLanguageFromKey }}</option>
+            }
+          </select>
+        </div>
+      }
+
+      <div class="mb-3">
+        <label jhiTranslate="userManagement.profiles">角色</label>
+        <select class="form-control" multiple name="authority" formControlName="authorities">
+          @for (authority of authorities; track $index) {
+            <option [value]="authority">{{ authority }}</option>
+          }
+        </select>
+      </div>
+      <button type="button" class="btn btn-secondary" (click)="previousState()">
+        <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">取消</span>
+      </button>
+
+      <button type="submit" [disabled]="editForm.invalid || isSaving" class="btn btn-primary">
+        <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">保存</span>
+      </button>
+    </form>
+  </div>
+</div>

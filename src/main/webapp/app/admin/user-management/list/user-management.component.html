@@ -1,0 +1,134 @@
+<div>
+  <h2>
+    <span id="user-management-page-heading" jhiTranslate="userManagement.home.title" data-cy="userManagementPageHeading">用户</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="loadAll()" [disabled]="isLoading">
+        <fa-icon icon="sync" [spin]="isLoading"></fa-icon>
+        <span jhiTranslate="userManagement.home.refreshListLabel">Refresh list</span>
+      </button>
+      <button class="btn btn-primary jh-create-entity" [routerLink]="['./new']">
+        <fa-icon icon="plus"></fa-icon> <span jhiTranslate="userManagement.home.createLabel">创建新用户</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  @if (users) {
+    <div class="table-responsive">
+      <table class="table table-striped" aria-describedby="user-management-page-heading">
+        <thead>
+          <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" (sortChange)="transition()">
+            <th scope="col" jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon icon="sort"></fa-icon></th>
+            <th scope="col" jhiSortBy="login"><span jhiTranslate="userManagement.login">登录</span> <fa-icon icon="sort"></fa-icon></th>
+            <th scope="col" jhiSortBy="email"><span jhiTranslate="userManagement.email">邮箱</span> <fa-icon icon="sort"></fa-icon></th>
+            <th scope="col"></th>
+            <th scope="col" jhiSortBy="langKey"><span jhiTranslate="userManagement.langKey">语言</span> <fa-icon icon="sort"></fa-icon></th>
+            <th scope="col"><span jhiTranslate="userManagement.profiles">角色</span></th>
+            <th scope="col" jhiSortBy="createdDate">
+              <span jhiTranslate="userManagement.createdDate">创建时间</span> <fa-icon icon="sort"></fa-icon>
+            </th>
+            <th scope="col" jhiSortBy="lastModifiedBy">
+              <span jhiTranslate="userManagement.lastModifiedBy">最近修改人</span> <fa-icon icon="sort"></fa-icon>
+            </th>
+            <th scope="col" jhiSortBy="lastModifiedDate">
+              <span jhiTranslate="userManagement.lastModifiedDate">最近修改时间</span> <fa-icon icon="sort"></fa-icon>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        @if (users) {
+          <tbody>
+            @for (user of users; track trackIdentity) {
+              <tr>
+                <td>
+                  <a [routerLink]="['./', user.login, 'view']">{{ user.id }}</a>
+                </td>
+                <td>{{ user.login }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+                  @if (!user.activated) {
+                    <button class="btn btn-danger btn-sm" (click)="setActive(user, true)" jhiTranslate="userManagement.deactivated">
+                      失效
+                    </button>
+                  } @else {
+                    <button
+                      class="btn btn-success btn-sm"
+                      (click)="setActive(user, false)"
+                      [disabled]="!currentAccount || currentAccount.login === user.login"
+                      jhiTranslate="userManagement.activated"
+                    >
+                      已激活
+                    </button>
+                  }
+                </td>
+                <td>{{ user.langKey }}</td>
+                <td>
+                  @for (authority of user.authorities; track $index) {
+                    <div>
+                      <span class="badge bg-info">{{ authority }}</span>
+                    </div>
+                  }
+                </td>
+                <td>{{ user.createdDate | date: 'dd/MM/yy HH:mm' }}</td>
+                <td>{{ user.lastModifiedBy }}</td>
+                <td>{{ user.lastModifiedDate | date: 'dd/MM/yy HH:mm' }}</td>
+                <td class="text-end">
+                  <div class="btn-group">
+                    <button type="submit" [routerLink]="['./', user.login, 'view']" class="btn btn-info btn-sm">
+                      <fa-icon icon="eye"></fa-icon>
+                      <span class="d-none d-md-inline" jhiTranslate="entity.action.view">查看</span>
+                    </button>
+
+                    <button
+                      type="submit"
+                      [routerLink]="['./', user.login, 'edit']"
+                      queryParamsHandling="merge"
+                      class="btn btn-primary btn-sm"
+                    >
+                      <fa-icon icon="pencil-alt"></fa-icon>
+                      <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">编辑</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      (click)="deleteUser(user)"
+                      class="btn btn-danger btn-sm"
+                      [disabled]="!currentAccount || currentAccount.login === user.login"
+                    >
+                      <fa-icon icon="times"></fa-icon>
+                      <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">删除</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        }
+      </table>
+    </div>
+  }
+
+  @if (users) {
+    <div>
+      <div class="d-flex justify-content-center">
+        <jhi-item-count [params]="{ page: page, totalItems: totalItems, itemsPerPage: itemsPerPage }"></jhi-item-count>
+      </div>
+
+      <div class="d-flex justify-content-center">
+        <ngb-pagination
+          [collectionSize]="totalItems"
+          [(page)]="page"
+          [pageSize]="itemsPerPage"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="transition()"
+        ></ngb-pagination>
+      </div>
+    </div>
+  }
+</div>
